@@ -12,7 +12,9 @@ insert layoffs_staging
 select *
 from layoffs;
 
+
 -- removing duplicates
+
 
 
 select *,
@@ -32,7 +34,9 @@ Select *
 from cte
 where row_num > 1;
 
+
 -- Create 2nd table to remove duplicates
+
 
 
 CREATE TABLE `layoffs_staging2` (
@@ -65,7 +69,10 @@ select *
 from layoffs_staging2
 where row_num = 1;
 
+
 -- standardizing data
+
+
 
 select company, trim(company)
 from layoffs_staging2; 
@@ -91,7 +98,9 @@ order by 1;
 update layoffs_staging2
 set country = trim(trailing '.' from country);
 
+
 -- Changing Datatype
+
 
 select `date`,
 str_to_date(`date`, '%m/%d/%Y')
@@ -105,6 +114,7 @@ from layoffs_staging2;
 
 alter table layoffs_staging2
 modify column `date` date;
+
 
 --Looking to see which nulls or blanks need to be filled
 
@@ -122,7 +132,9 @@ select *
 from layoffs_staging2
 where company = 'airbnb';
 
+
 -- Making sure the proper nulls and blanks are filled
+
 
 select t1.industry, t2.industry
 from layoffs_staging2 t1
