@@ -1,3 +1,56 @@
+-- https://www.kaggle.com/datasets/swaptr/layoffs-2022
+
+
+-- Creating staging table
+
+
+create table layoffs_staging
+like layoffs;
+
+
+insert layoffs_staging
+select *
+from layoffs;
+
+
+-- removing duplicates
+
+
+
+select *,
+row_number() over(partition by company, location, industry, total_laid_off, percentage_laid_off,`date`, stage, country, funds_raised_millions) as Row_numb
+from layoffs_staging;
+
+
+With cte as (
+select *,
+row_number() over(
+partition by company, location, industry, total_laid_off, percentage_laid_off,`date`, stage, country, funds_raised_millions) as row_num
+from layoffs_staging
+)
+Select *
+from cte
+where row_num > 1;
+
+
+-- Create 2nd table to remove duplicates
+
+
+
+CREATE TABLE `layoffs_staging2` (
+  `company` text,
+  `location` text,
+  `industry` text,
+  `total_laid_off` int DEFAULT NULL,
+  `percentage_laid_off` text,
+  `date` text,
+  `stage` text,
+  `country` text,
+  `funds_raised_millions` int DEFAULT NULL,
+  `row_num` int
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 SELECT * FROM world_layoffs.layoffs_staging2;
 
 Insert into layoffs_staging2
@@ -14,7 +67,10 @@ select *
 from layoffs_staging2
 where row_num = 1;
 
+
 -- standardizing data
+
+
 
 select company, trim(company)
 from layoffs_staging2; 
@@ -40,6 +96,10 @@ order by 1;
 update layoffs_staging2
 set country = trim(trailing '.' from country);
 
+
+-- Changing Datatype
+
+
 select `date`,
 str_to_date(`date`, '%m/%d/%Y')
 from layoffs_staging2;
@@ -53,6 +113,10 @@ from layoffs_staging2;
 alter table layoffs_staging2
 modify column `date` date;
 
+
+--Looking to see which nulls or blanks need to be filled
+
+
 select *
 from layoffs_staging2
 where total_laid_off is null
@@ -65,6 +129,10 @@ where industry is null or industry = '';
 select *
 from layoffs_staging2
 where company = 'airbnb';
+
+
+-- Making sure the proper nulls and blanks are filled
+
 
 select t1.industry, t2.industry
 from layoffs_staging2 t1
@@ -89,13 +157,5 @@ and percentage_laid_off is null;
 
 alter table layoffs_staging2
 drop column row_num;
-
-
-
-
-
-
-
-
 
 
