@@ -18,16 +18,14 @@ from layoffs;
 
 
 select *,
-row_number() over(partition by company, location, industry, total_laid_off, 
-				percentage_laid_off,`date`, stage, country, funds_raised_millions) as Row_numb
+row_number() over(partition by company, location, industry, total_laid_off, percentage_laid_off,`date`, stage, country, funds_raised_millions) as Row_numb
 from layoffs_staging;
 
 
 With cte as (
 select *,
 row_number() over(
-partition by company, location, industry, total_laid_off, 
-percentage_laid_off,`date`, stage, country, funds_raised_millions) as row_num
+partition by company, location, industry, total_laid_off, percentage_laid_off,`date`, stage, country, funds_raised_millions) as row_num
 from layoffs_staging
 )
 Select *
